@@ -80,7 +80,6 @@ static void usart_handler(uint8_t port)
 			udi_cdc_multi_putc(port, value);
 		}
 		ui_com_tx_stop();
-		return;
 	}
 
 	if (sr & US_CSR_TXRDY) {

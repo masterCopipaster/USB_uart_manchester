@@ -19,19 +19,19 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   7 .debug_abbrev 00003a69  00000000  00000000  0003c9ae  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_loc    00006a9d  00000000  00000000  00040417  2**0
+  8 .debug_loc    00006a87  00000000  00000000  00040417  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_aranges 00000be8  00000000  00000000  00046eb4  2**0
+  9 .debug_aranges 00000be8  00000000  00000000  00046e9e  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_ranges 00000cc8  00000000  00000000  00047a9c  2**0
+ 10 .debug_ranges 00000cc8  00000000  00000000  00047a86  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_macro  0001b689  00000000  00000000  00048764  2**0
+ 11 .debug_macro  0001b69f  00000000  00000000  0004874e  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_line   00012174  00000000  00000000  00063ded  2**0
+ 12 .debug_line   000121bd  00000000  00000000  00063ded  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_str    00072c92  00000000  00000000  00075f61  2**0
+ 13 .debug_str    00072ca2  00000000  00000000  00075faa  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_frame  00001d84  00000000  00000000  000e8bf4  2**2
+ 14 .debug_frame  00001d84  00000000  00000000  000e8c4c  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -8096,13 +8096,13 @@ static void usart_handler(uint8_t port)
 	if (sr & US_CSR_RXRDY) {
    834a0:	f010 0f01 	tst.w	r0, #1
    834a4:	d106      	bne.n	834b4 <usart_handler+0x2c>
+			udi_cdc_multi_putc(port, value);
 		}
 		ui_com_tx_stop();
-		return;
 	}
 
 	if (sr & US_CSR_TXRDY) {
-   834a6:	f010 0f02 	tst.w	r0, #2
+   834a6:	f015 0f02 	tst.w	r5, #2
    834aa:	d12a      	bne.n	83502 <usart_handler+0x7a>
 			usart_disable_tx(usart);
 			usart_disable_interrupt(usart, US_IDR_TXRDY);
@@ -8142,7 +8142,7 @@ static void usart_handler(uint8_t port)
 		ui_com_tx_stop();
    834da:	4b1e      	ldr	r3, [pc, #120]	; (83554 <usart_handler+0xcc>)
    834dc:	4798      	blx	r3
-   834de:	e7e5      	b.n	834ac <usart_handler+0x24>
+   834de:	e7e2      	b.n	834a6 <usart_handler+0x1e>
 			usart_reset_rx(usart);
    834e0:	4620      	mov	r0, r4
    834e2:	4b1d      	ldr	r3, [pc, #116]	; (83558 <usart_handler+0xd0>)
@@ -8182,6 +8182,7 @@ static void usart_handler(uint8_t port)
 			ui_com_rx_stop();
    83518:	4b17      	ldr	r3, [pc, #92]	; (83578 <usart_handler+0xf0>)
    8351a:	4798      	blx	r3
+}
    8351c:	e7c6      	b.n	834ac <usart_handler+0x24>
 			ui_com_rx_start();
    8351e:	4b17      	ldr	r3, [pc, #92]	; (8357c <usart_handler+0xf4>)

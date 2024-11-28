@@ -20,6 +20,8 @@ src\ASF\sam\boards\arduino_due_x\init.c
 
 src\ASF\sam\boards\arduino_due_x\led.c
 
+src\ASF\sam\drivers\pdc\pdc.c
+
 src\ASF\sam\drivers\pio\pio.c
 
 src\ASF\sam\drivers\pio\pio_handler.c
