@@ -5083,7 +5083,7 @@ Discarded input sections
  .debug_macro   0x00000000       0x35 src/ASF/sam/utils/syscalls/gcc/syscalls.o
  .debug_macro   0x00000000      0x122 src/ASF/sam/utils/syscalls/gcc/syscalls.o
  .debug_line    0x00000000      0x40b src/ASF/sam/utils/syscalls/gcc/syscalls.o
- .debug_str     0x00000000     0x7419 src/ASF/sam/utils/syscalls/gcc/syscalls.o
+ .debug_str     0x00000000     0x741b src/ASF/sam/utils/syscalls/gcc/syscalls.o
  .comment       0x00000000       0x5a src/ASF/sam/utils/syscalls/gcc/syscalls.o
  .debug_frame   0x00000000       0xa0 src/ASF/sam/utils/syscalls/gcc/syscalls.o
  .ARM.attributes
@@ -6902,46 +6902,46 @@ OUTPUT(USB_uart_manchester.elf elf32-littlearm)
  .debug_line    0x0001007e     0x1079 src/main.o
  .debug_line    0x000110f7     0x10c6 src/uart_sam.o
 
-.debug_str      0x00000000    0x72ca2
- .debug_str     0x00000000    0x6383e src/ASF/common/services/usb/class/cdc/device/example2/sam3x8e_arduino_due_x/ui.o
-                              0x63beb (size before relaxing)
- .debug_str     0x0006383e      0xdb8 src/ASF/common/services/clock/sam3x/sysclk.o
-                              0x630f5 (size before relaxing)
- .debug_str     0x000645f6      0x193 src/ASF/common/services/sleepmgr/sam/sleepmgr.o
-                              0x5f160 (size before relaxing)
- .debug_str     0x00064789     0x3861 src/ASF/common/services/usb/class/cdc/device/udi_cdc.o
-                              0x63a2c (size before relaxing)
- .debug_str     0x00067fea      0x775 src/ASF/common/services/usb/class/cdc/device/udi_cdc_desc.o
-                              0x63379 (size before relaxing)
- .debug_str     0x0006875f      0x853 src/ASF/common/services/usb/udc/udc.o
-                              0x621a9 (size before relaxing)
- .debug_str     0x00068fb2       0x65 src/ASF/common/utils/interrupt/interrupt_sam_nvic.o
-                              0x5f024 (size before relaxing)
- .debug_str     0x00069017      0x537 src/ASF/sam/boards/arduino_due_x/init.o
-                              0x63853 (size before relaxing)
- .debug_str     0x0006954e      0x109 src/ASF/sam/boards/arduino_due_x/led.o
-                              0x62a45 (size before relaxing)
- .debug_str     0x00069657      0x3e7 src/ASF/sam/drivers/pio/pio.o
-                              0x5f978 (size before relaxing)
- .debug_str     0x00069a3e      0x42d src/ASF/sam/drivers/pio/pio_handler.o
-                              0x5fa85 (size before relaxing)
- .debug_str     0x00069e6b      0x579 src/ASF/sam/drivers/pmc/pmc.o
-                              0x5f9e2 (size before relaxing)
- .debug_str     0x0006a3e4      0x189 src/ASF/sam/drivers/pmc/sleep.o
-                              0x629a4 (size before relaxing)
- .debug_str     0x0006a56d     0x7608 src/ASF/sam/drivers/uotghs/uotghs_device.o
-                              0x6d2e1 (size before relaxing)
- .debug_str     0x00071b75      0xc28 src/ASF/sam/drivers/usart/usart.o
-                              0x5fc4a (size before relaxing)
- .debug_str     0x0007279d       0x4d src/ASF/sam/utils/cmsis/sam3x/source/templates/exceptions.o
-                              0x5efed (size before relaxing)
- .debug_str     0x000727ea       0xec src/ASF/sam/utils/cmsis/sam3x/source/templates/gcc/startup_sam3x.o
-                              0x5f101 (size before relaxing)
- .debug_str     0x000728d6      0x171 src/ASF/sam/utils/cmsis/sam3x/source/templates/system_sam3x.o
-                              0x5f2c5 (size before relaxing)
- .debug_str     0x00072a47       0xc1 src/main.o
+.debug_str      0x00000000    0x72ce8
+ .debug_str     0x00000000    0x63840 src/ASF/common/services/usb/class/cdc/device/example2/sam3x8e_arduino_due_x/ui.o
+                              0x63bed (size before relaxing)
+ .debug_str     0x00063840      0xdb8 src/ASF/common/services/clock/sam3x/sysclk.o
+                              0x630f7 (size before relaxing)
+ .debug_str     0x000645f8      0x193 src/ASF/common/services/sleepmgr/sam/sleepmgr.o
+                              0x5f162 (size before relaxing)
+ .debug_str     0x0006478b     0x3861 src/ASF/common/services/usb/class/cdc/device/udi_cdc.o
+                              0x63a2e (size before relaxing)
+ .debug_str     0x00067fec      0x775 src/ASF/common/services/usb/class/cdc/device/udi_cdc_desc.o
+                              0x6337b (size before relaxing)
+ .debug_str     0x00068761      0x853 src/ASF/common/services/usb/udc/udc.o
+                              0x621ab (size before relaxing)
+ .debug_str     0x00068fb4       0x65 src/ASF/common/utils/interrupt/interrupt_sam_nvic.o
+                              0x5f026 (size before relaxing)
+ .debug_str     0x00069019      0x537 src/ASF/sam/boards/arduino_due_x/init.o
+                              0x63855 (size before relaxing)
+ .debug_str     0x00069550      0x109 src/ASF/sam/boards/arduino_due_x/led.o
+                              0x62a47 (size before relaxing)
+ .debug_str     0x00069659      0x3e7 src/ASF/sam/drivers/pio/pio.o
+                              0x5f97a (size before relaxing)
+ .debug_str     0x00069a40      0x42d src/ASF/sam/drivers/pio/pio_handler.o
+                              0x5fa87 (size before relaxing)
+ .debug_str     0x00069e6d      0x579 src/ASF/sam/drivers/pmc/pmc.o
+                              0x5f9e4 (size before relaxing)
+ .debug_str     0x0006a3e6      0x189 src/ASF/sam/drivers/pmc/sleep.o
+                              0x629a6 (size before relaxing)
+ .debug_str     0x0006a56f     0x7608 src/ASF/sam/drivers/uotghs/uotghs_device.o
+                              0x6d2e3 (size before relaxing)
+ .debug_str     0x00071b77      0xc28 src/ASF/sam/drivers/usart/usart.o
+                              0x5fc4c (size before relaxing)
+ .debug_str     0x0007279f       0x4d src/ASF/sam/utils/cmsis/sam3x/source/templates/exceptions.o
+                              0x5efef (size before relaxing)
+ .debug_str     0x000727ec       0xec src/ASF/sam/utils/cmsis/sam3x/source/templates/gcc/startup_sam3x.o
+                              0x5f103 (size before relaxing)
+ .debug_str     0x000728d8      0x171 src/ASF/sam/utils/cmsis/sam3x/source/templates/system_sam3x.o
+                              0x5f2c7 (size before relaxing)
+ .debug_str     0x00072a49      0x105 src/main.o
                               0x67525 (size before relaxing)
- .debug_str     0x00072b08      0x19a src/uart_sam.o
+ .debug_str     0x00072b4e      0x19a src/uart_sam.o
                               0x67cc0 (size before relaxing)
 
 .debug_frame    0x00000000     0x1d84

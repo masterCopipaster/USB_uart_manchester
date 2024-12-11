@@ -29,9 +29,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
  12 .debug_line   000121bd  00000000  00000000  00063ded  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_str    00072ca2  00000000  00000000  00075faa  2**0
+ 13 .debug_str    00072ce8  00000000  00000000  00075faa  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_frame  00001d84  00000000  00000000  000e8c4c  2**2
+ 14 .debug_frame  00001d84  00000000  00000000  000e8c94  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -7842,23 +7842,12 @@ void SystemCoreClockUpdate(void)
    8336c:	aaaaaaab 	.word	0xaaaaaaab
 
 00083370 <main>:
-static volatile bool main_b_cdc_enable = false;
-
-/*! \brief Main function. Execution starts here.
- */
-int main(void)
-{
    83370:	b580      	push	{r7, lr}
-	irq_initialize_vectors();
-	cpu_irq_enable();
    83372:	2101      	movs	r1, #1
    83374:	4b1c      	ldr	r3, [pc, #112]	; (833e8 <main+0x78>)
    83376:	7019      	strb	r1, [r3, #0]
-  __ASM volatile ("dmb 0xF":::"memory");
    83378:	f3bf 8f5f 	dmb	sy
-  __ASM volatile ("cpsie i" : : : "memory");
    8337c:	b662      	cpsie	i
-		sleepmgr_locks[i] = 0;
    8337e:	4b1b      	ldr	r3, [pc, #108]	; (833ec <main+0x7c>)
    83380:	2200      	movs	r2, #0
    83382:	701a      	strb	r2, [r3, #0]
@@ -7866,89 +7855,45 @@ int main(void)
    83386:	709a      	strb	r2, [r3, #2]
    83388:	70da      	strb	r2, [r3, #3]
    8338a:	711a      	strb	r2, [r3, #4]
-	sleepmgr_locks[SLEEPMGR_NR_OF_MODES - 1] = 1;
    8338c:	7159      	strb	r1, [r3, #5]
-
-	// Initialize the sleep manager
-	sleepmgr_init();
-
-	sysclk_init();
    8338e:	4b18      	ldr	r3, [pc, #96]	; (833f0 <main+0x80>)
    83390:	4798      	blx	r3
-	board_init();
    83392:	4b18      	ldr	r3, [pc, #96]	; (833f4 <main+0x84>)
    83394:	4798      	blx	r3
-	ui_init();
    83396:	4b18      	ldr	r3, [pc, #96]	; (833f8 <main+0x88>)
    83398:	4798      	blx	r3
-	ui_powerdown();
    8339a:	4b18      	ldr	r3, [pc, #96]	; (833fc <main+0x8c>)
    8339c:	4798      	blx	r3
-
-	// Start USB stack to authorize VBus monitoring
-	udc_start();
    8339e:	4b18      	ldr	r3, [pc, #96]	; (83400 <main+0x90>)
    833a0:	4798      	blx	r3
-static inline void sleepmgr_enter_sleep(void)
-{
-#ifdef CONFIG_SLEEPMGR_ENABLE
-	enum sleepmgr_mode sleep_mode;
-
-	cpu_irq_disable();
    833a2:	4c11      	ldr	r4, [pc, #68]	; (833e8 <main+0x78>)
    833a4:	2500      	movs	r5, #0
    833a6:	462f      	mov	r7, r5
-	while (!(*lock_ptr)) {
    833a8:	4e10      	ldr	r6, [pc, #64]	; (833ec <main+0x7c>)
-	Assert(sleep_mode != SLEEPMGR_ACTIVE);
-#ifdef CONFIG_SLEEPMGR_ENABLE
-	cpu_irq_disable();
-
-	// Atomically enable the global interrupts and enter the sleep mode.
-	pmc_sleep(sleep_mode);
    833aa:	f8df 8058 	ldr.w	r8, [pc, #88]	; 83404 <main+0x94>
    833ae:	e004      	b.n	833ba <main+0x4a>
-
-	// Find the deepest allowable sleep mode
-	sleep_mode = sleepmgr_get_sleep_mode();
-	// Return right away if first mode (ACTIVE) is locked.
-	if (sleep_mode==SLEEPMGR_ACTIVE) {
-		cpu_irq_enable();
    833b0:	2301      	movs	r3, #1
    833b2:	7023      	strb	r3, [r4, #0]
-  __ASM volatile ("dmb 0xF":::"memory");
    833b4:	f3bf 8f5f 	dmb	sy
-  __ASM volatile ("cpsie i" : : : "memory");
    833b8:	b662      	cpsie	i
-  __ASM volatile ("cpsid i" : : : "memory");
    833ba:	b672      	cpsid	i
-  __ASM volatile ("dmb 0xF":::"memory");
    833bc:	f3bf 8f5f 	dmb	sy
-	cpu_irq_disable();
    833c0:	7027      	strb	r7, [r4, #0]
-	while (!(*lock_ptr)) {
    833c2:	7833      	ldrb	r3, [r6, #0]
    833c4:	2b00      	cmp	r3, #0
    833c6:	d1f3      	bne.n	833b0 <main+0x40>
    833c8:	4b08      	ldr	r3, [pc, #32]	; (833ec <main+0x7c>)
    833ca:	4628      	mov	r0, r5
-		sleep_mode = (enum sleepmgr_mode)(sleep_mode + 1);
    833cc:	3001      	adds	r0, #1
    833ce:	b2c0      	uxtb	r0, r0
-	while (!(*lock_ptr)) {
    833d0:	f813 2f01 	ldrb.w	r2, [r3, #1]!
    833d4:	2a00      	cmp	r2, #0
    833d6:	d0f9      	beq.n	833cc <main+0x5c>
-	if (sleep_mode==SLEEPMGR_ACTIVE) {
    833d8:	2800      	cmp	r0, #0
    833da:	d0e9      	beq.n	833b0 <main+0x40>
-  __ASM volatile ("cpsid i" : : : "memory");
    833dc:	b672      	cpsid	i
-  __ASM volatile ("dmb 0xF":::"memory");
    833de:	f3bf 8f5f 	dmb	sy
-	cpu_irq_disable();
    833e2:	7025      	strb	r5, [r4, #0]
-	pmc_sleep(sleep_mode);
    833e4:	47c0      	blx	r8
    833e6:	e7e8      	b.n	833ba <main+0x4a>
    833e8:	2007031c 	.word	0x2007031c
@@ -7961,44 +7906,25 @@ static inline void sleepmgr_enter_sleep(void)
    83404:	00081969 	.word	0x00081969
 
 00083408 <main_suspend_action>:
-		sleepmgr_enter_sleep();
-	}
-}
-
-void main_suspend_action(void)
-{
    83408:	b508      	push	{r3, lr}
-	ui_powerdown();
    8340a:	4b01      	ldr	r3, [pc, #4]	; (83410 <main_suspend_action+0x8>)
    8340c:	4798      	blx	r3
    8340e:	bd08      	pop	{r3, pc}
    83410:	0008017d 	.word	0x0008017d
 
 00083414 <main_resume_action>:
-}
-
-void main_resume_action(void)
-{
    83414:	b508      	push	{r3, lr}
-	ui_wakeup();
    83416:	4b01      	ldr	r3, [pc, #4]	; (8341c <main_resume_action+0x8>)
    83418:	4798      	blx	r3
    8341a:	bd08      	pop	{r3, pc}
    8341c:	00080195 	.word	0x00080195
 
 00083420 <main_sof_action>:
-}
-
-void main_sof_action(void)
-{
    83420:	b508      	push	{r3, lr}
-	if (!main_b_cdc_enable)
    83422:	4b04      	ldr	r3, [pc, #16]	; (83434 <main_sof_action+0x14>)
    83424:	781b      	ldrb	r3, [r3, #0]
    83426:	b903      	cbnz	r3, 8342a <main_sof_action+0xa>
    83428:	bd08      	pop	{r3, pc}
-		return;
-	ui_process(udd_get_frame_number());
    8342a:	4b03      	ldr	r3, [pc, #12]	; (83438 <main_sof_action+0x18>)
    8342c:	4798      	blx	r3
    8342e:	4b03      	ldr	r3, [pc, #12]	; (8343c <main_sof_action+0x1c>)
@@ -8009,37 +7935,22 @@ void main_sof_action(void)
    8343c:	000801f1 	.word	0x000801f1
 
 00083440 <main_cdc_enable>:
-}
-
-bool main_cdc_enable(uint8_t port)
-{
    83440:	b510      	push	{r4, lr}
-	main_b_cdc_enable = true;
    83442:	2401      	movs	r4, #1
    83444:	4b02      	ldr	r3, [pc, #8]	; (83450 <main_cdc_enable+0x10>)
    83446:	701c      	strb	r4, [r3, #0]
-	// Open communication
-	uart_open(port);
    83448:	4b02      	ldr	r3, [pc, #8]	; (83454 <main_cdc_enable+0x14>)
    8344a:	4798      	blx	r3
-	return true;
-}
    8344c:	4620      	mov	r0, r4
    8344e:	bd10      	pop	{r4, pc}
    83450:	200718fc 	.word	0x200718fc
    83454:	000836b5 	.word	0x000836b5
 
 00083458 <main_cdc_disable>:
-
-void main_cdc_disable(uint8_t port)
-{
    83458:	b508      	push	{r3, lr}
-	main_b_cdc_enable = false;
    8345a:	2200      	movs	r2, #0
    8345c:	4b02      	ldr	r3, [pc, #8]	; (83468 <main_cdc_disable+0x10>)
    8345e:	701a      	strb	r2, [r3, #0]
-	// Close communication
-	uart_close(port);
    83460:	4b02      	ldr	r3, [pc, #8]	; (8346c <main_cdc_disable+0x14>)
    83462:	4798      	blx	r3
    83464:	bd08      	pop	{r3, pc}
@@ -8048,22 +7959,11 @@ void main_cdc_disable(uint8_t port)
    8346c:	00083745 	.word	0x00083745
 
 00083470 <main_cdc_set_dtr>:
-}
-
-void main_cdc_set_dtr(uint8_t port, bool b_enable)
-{
    83470:	b508      	push	{r3, lr}
-	if (b_enable) {
    83472:	b911      	cbnz	r1, 8347a <main_cdc_set_dtr+0xa>
-		// Host terminal has open COM
-		ui_com_open(port);
-	}else{
-		// Host terminal has close COM
-		ui_com_close(port);
    83474:	4b02      	ldr	r3, [pc, #8]	; (83480 <main_cdc_set_dtr+0x10>)
    83476:	4798      	blx	r3
    83478:	bd08      	pop	{r3, pc}
-		ui_com_open(port);
    8347a:	4b02      	ldr	r3, [pc, #8]	; (83484 <main_cdc_set_dtr+0x14>)
    8347c:	4798      	blx	r3
    8347e:	bd08      	pop	{r3, pc}
@@ -8071,127 +7971,83 @@ void main_cdc_set_dtr(uint8_t port, bool b_enable)
    83484:	000801a5 	.word	0x000801a5
 
 00083488 <usart_handler>:
-	}
-	return usart;
-}
-
-static void usart_handler(uint8_t port)
-{
    83488:	b570      	push	{r4, r5, r6, lr}
    8348a:	b082      	sub	sp, #8
-	if (0 == port) {
    8348c:	4606      	mov	r6, r0
    8348e:	b178      	cbz	r0, 834b0 <usart_handler+0x28>
-		usart = USART_BASE_1;
    83490:	2801      	cmp	r0, #1
    83492:	4c28      	ldr	r4, [pc, #160]	; (83534 <usart_handler+0xac>)
    83494:	bf18      	it	ne
    83496:	2400      	movne	r4, #0
-	Usart* usart = get_usart(port);
-	uint32_t sr = usart_get_status(usart);
    83498:	4620      	mov	r0, r4
    8349a:	4b27      	ldr	r3, [pc, #156]	; (83538 <usart_handler+0xb0>)
    8349c:	4798      	blx	r3
    8349e:	4605      	mov	r5, r0
-	if (sr & US_CSR_RXRDY) {
    834a0:	f010 0f01 	tst.w	r0, #1
    834a4:	d106      	bne.n	834b4 <usart_handler+0x2c>
-			udi_cdc_multi_putc(port, value);
-		}
-		ui_com_tx_stop();
-	}
-
-	if (sr & US_CSR_TXRDY) {
    834a6:	f015 0f02 	tst.w	r5, #2
    834aa:	d12a      	bne.n	83502 <usart_handler+0x7a>
-			usart_disable_tx(usart);
-			usart_disable_interrupt(usart, US_IDR_TXRDY);
-			ui_com_rx_stop();
-		}
-	}
-}
    834ac:	b002      	add	sp, #8
    834ae:	bd70      	pop	{r4, r5, r6, pc}
-		usart = USART_BASE_0;
    834b0:	4c22      	ldr	r4, [pc, #136]	; (8353c <usart_handler+0xb4>)
    834b2:	e7f1      	b.n	83498 <usart_handler+0x10>
-		ui_com_tx_start();
    834b4:	4b22      	ldr	r3, [pc, #136]	; (83540 <usart_handler+0xb8>)
    834b6:	4798      	blx	r3
-		bool b_error = usart_read(usart, &value) ||
    834b8:	a901      	add	r1, sp, #4
    834ba:	4620      	mov	r0, r4
    834bc:	4b21      	ldr	r3, [pc, #132]	; (83544 <usart_handler+0xbc>)
    834be:	4798      	blx	r3
    834c0:	b970      	cbnz	r0, 834e0 <usart_handler+0x58>
-		if (b_error) {
    834c2:	f415 7fe0 	tst.w	r5, #448	; 0x1c0
    834c6:	d10b      	bne.n	834e0 <usart_handler+0x58>
-		if (!udi_cdc_multi_is_tx_ready(port)) {
    834c8:	4630      	mov	r0, r6
    834ca:	4b1f      	ldr	r3, [pc, #124]	; (83548 <usart_handler+0xc0>)
    834cc:	4798      	blx	r3
    834ce:	b998      	cbnz	r0, 834f8 <usart_handler+0x70>
-			udi_cdc_multi_signal_overrun(port);
    834d0:	4630      	mov	r0, r6
    834d2:	4b1e      	ldr	r3, [pc, #120]	; (8354c <usart_handler+0xc4>)
    834d4:	4798      	blx	r3
-			ui_com_overflow();
    834d6:	4b1e      	ldr	r3, [pc, #120]	; (83550 <usart_handler+0xc8>)
    834d8:	4798      	blx	r3
-		ui_com_tx_stop();
    834da:	4b1e      	ldr	r3, [pc, #120]	; (83554 <usart_handler+0xcc>)
    834dc:	4798      	blx	r3
    834de:	e7e2      	b.n	834a6 <usart_handler+0x1e>
-			usart_reset_rx(usart);
    834e0:	4620      	mov	r0, r4
    834e2:	4b1d      	ldr	r3, [pc, #116]	; (83558 <usart_handler+0xd0>)
    834e4:	4798      	blx	r3
-			usart_enable_rx(usart);
    834e6:	4620      	mov	r0, r4
    834e8:	4b1c      	ldr	r3, [pc, #112]	; (8355c <usart_handler+0xd4>)
    834ea:	4798      	blx	r3
-			udi_cdc_multi_signal_framing_error(port);
    834ec:	4630      	mov	r0, r6
    834ee:	4b1c      	ldr	r3, [pc, #112]	; (83560 <usart_handler+0xd8>)
    834f0:	4798      	blx	r3
-			ui_com_error();
    834f2:	4b1c      	ldr	r3, [pc, #112]	; (83564 <usart_handler+0xdc>)
    834f4:	4798      	blx	r3
    834f6:	e7e7      	b.n	834c8 <usart_handler+0x40>
-			udi_cdc_multi_putc(port, value);
    834f8:	9901      	ldr	r1, [sp, #4]
    834fa:	4630      	mov	r0, r6
    834fc:	4b1a      	ldr	r3, [pc, #104]	; (83568 <usart_handler+0xe0>)
    834fe:	4798      	blx	r3
    83500:	e7eb      	b.n	834da <usart_handler+0x52>
-		if (udi_cdc_multi_is_rx_ready(port)) {
    83502:	4630      	mov	r0, r6
    83504:	4b19      	ldr	r3, [pc, #100]	; (8356c <usart_handler+0xe4>)
    83506:	4798      	blx	r3
    83508:	b948      	cbnz	r0, 8351e <usart_handler+0x96>
-			usart_disable_tx(usart);
    8350a:	4620      	mov	r0, r4
    8350c:	4b18      	ldr	r3, [pc, #96]	; (83570 <usart_handler+0xe8>)
    8350e:	4798      	blx	r3
-			usart_disable_interrupt(usart, US_IDR_TXRDY);
    83510:	2102      	movs	r1, #2
    83512:	4620      	mov	r0, r4
    83514:	4b17      	ldr	r3, [pc, #92]	; (83574 <usart_handler+0xec>)
    83516:	4798      	blx	r3
-			ui_com_rx_stop();
    83518:	4b17      	ldr	r3, [pc, #92]	; (83578 <usart_handler+0xf0>)
    8351a:	4798      	blx	r3
-}
    8351c:	e7c6      	b.n	834ac <usart_handler+0x24>
-			ui_com_rx_start();
    8351e:	4b17      	ldr	r3, [pc, #92]	; (8357c <usart_handler+0xf4>)
    83520:	4798      	blx	r3
-			int c = udi_cdc_multi_getc(port);
    83522:	4630      	mov	r0, r6
    83524:	4b16      	ldr	r3, [pc, #88]	; (83580 <usart_handler+0xf8>)
    83526:	4798      	blx	r3
-			usart_write(usart, c);
    83528:	4601      	mov	r1, r0
    8352a:	4620      	mov	r0, r4
    8352c:	4b15      	ldr	r3, [pc, #84]	; (83584 <usart_handler+0xfc>)
@@ -8221,11 +8077,7 @@ static void usart_handler(uint8_t port)
    83584:	00083191 	.word	0x00083191
 
 00083588 <USART1_Handler>:
-
-ISR(USART_HANDLER_0)
-{
    83588:	b508      	push	{r3, lr}
-	usart_handler(0);
    8358a:	2000      	movs	r0, #0
    8358c:	4b01      	ldr	r3, [pc, #4]	; (83594 <USART1_Handler+0xc>)
    8358e:	4798      	blx	r3
@@ -8234,12 +8086,7 @@ ISR(USART_HANDLER_0)
    83594:	00083489 	.word	0x00083489
 
 00083598 <USART0_Handler>:
-}
-
-ISR(USART_HANDLER_1)
-{
    83598:	b508      	push	{r3, lr}
-	usart_handler(1);
    8359a:	2001      	movs	r0, #1
    8359c:	4b01      	ldr	r3, [pc, #4]	; (835a4 <USART0_Handler+0xc>)
    8359e:	4798      	blx	r3
@@ -8248,43 +8095,27 @@ ISR(USART_HANDLER_1)
    835a4:	00083489 	.word	0x00083489
 
 000835a8 <uart_rx_notify>:
-}
-
-void uart_rx_notify(uint8_t port)
-{
    835a8:	b510      	push	{r4, lr}
-	if (0 == port) {
    835aa:	b150      	cbz	r0, 835c2 <uart_rx_notify+0x1a>
-		usart = USART_BASE_1;
    835ac:	2801      	cmp	r0, #1
    835ae:	4c0a      	ldr	r4, [pc, #40]	; (835d8 <uart_rx_notify+0x30>)
    835b0:	bf18      	it	ne
    835b2:	2400      	movne	r4, #0
-	Usart* usart = get_usart(port);
-	// If UART is open
-	if (usart_get_interrupt_mask(usart)
    835b4:	4620      	mov	r0, r4
    835b6:	4b09      	ldr	r3, [pc, #36]	; (835dc <uart_rx_notify+0x34>)
    835b8:	4798      	blx	r3
    835ba:	f010 0f01 	tst.w	r0, #1
    835be:	d102      	bne.n	835c6 <uart_rx_notify+0x1e>
    835c0:	bd10      	pop	{r4, pc}
-		usart = USART_BASE_0;
    835c2:	4c07      	ldr	r4, [pc, #28]	; (835e0 <uart_rx_notify+0x38>)
    835c4:	e7f6      	b.n	835b4 <uart_rx_notify+0xc>
-		& US_IMR_RXRDY) {
-		// Enable UART TX interrupt to send a new value
-		usart_enable_tx(usart);
    835c6:	4620      	mov	r0, r4
    835c8:	4b06      	ldr	r3, [pc, #24]	; (835e4 <uart_rx_notify+0x3c>)
    835ca:	4798      	blx	r3
-		usart_enable_interrupt(usart, US_IER_TXRDY);
    835cc:	2102      	movs	r1, #2
    835ce:	4620      	mov	r0, r4
    835d0:	4b05      	ldr	r3, [pc, #20]	; (835e8 <uart_rx_notify+0x40>)
    835d2:	4798      	blx	r3
-	}
-}
    835d4:	e7f4      	b.n	835c0 <uart_rx_notify+0x18>
    835d6:	bf00      	nop
    835d8:	40098000 	.word	0x40098000
@@ -8294,138 +8125,71 @@ void uart_rx_notify(uint8_t port)
    835e8:	00083181 	.word	0x00083181
 
 000835ec <uart_config>:
-
-
-void uart_config(uint8_t port, usb_cdc_line_coding_t * cfg)
-{
    835ec:	b570      	push	{r4, r5, r6, lr}
-	if (0 == port) {
    835ee:	b198      	cbz	r0, 83618 <uart_config+0x2c>
-		usart = USART_BASE_1;
    835f0:	2801      	cmp	r0, #1
    835f2:	4c26      	ldr	r4, [pc, #152]	; (8368c <uart_config+0xa0>)
    835f4:	bf18      	it	ne
    835f6:	2400      	movne	r4, #0
-	Usart* usart = get_usart(port);
-	uint32_t stopbits, parity, databits;
-	uint32_t imr;
-
-	switch (cfg->bCharFormat) {
    835f8:	790b      	ldrb	r3, [r1, #4]
    835fa:	2b01      	cmp	r3, #1
    835fc:	d00e      	beq.n	8361c <uart_config+0x30>
-		stopbits = US_MR_NBSTOP_1_5_BIT;
-		break;
-	case CDC_STOP_BITS_1:
-	default:
-		// Default stop bit = 1 stop bit
-		stopbits = US_MR_NBSTOP_1_BIT;
    835fe:	2b02      	cmp	r3, #2
    83600:	bf0c      	ite	eq
    83602:	f44f 5000 	moveq.w	r0, #8192	; 0x2000
    83606:	2000      	movne	r0, #0
-		break;
-	}
-
-	switch (cfg->bParityType) {
    83608:	794b      	ldrb	r3, [r1, #5]
    8360a:	3b01      	subs	r3, #1
    8360c:	2b03      	cmp	r3, #3
    8360e:	d811      	bhi.n	83634 <uart_config+0x48>
    83610:	e8df f003 	tbb	[pc, r3]
    83614:	0d0a1307 	.word	0x0d0a1307
-		usart = USART_BASE_0;
    83618:	4c1d      	ldr	r4, [pc, #116]	; (83690 <uart_config+0xa4>)
    8361a:	e7ed      	b.n	835f8 <uart_config+0xc>
-		stopbits = US_MR_NBSTOP_1_5_BIT;
    8361c:	f44f 5080 	mov.w	r0, #4096	; 0x1000
    83620:	e7f2      	b.n	83608 <uart_config+0x1c>
-	case CDC_PAR_EVEN:
-		parity = US_MR_PAR_EVEN;
-		break;
-	case CDC_PAR_ODD:
-		parity = US_MR_PAR_ODD;
    83622:	f44f 7200 	mov.w	r2, #512	; 0x200
    83626:	e009      	b.n	8363c <uart_config+0x50>
-		break;
-	case CDC_PAR_MARK:
-		parity = US_MR_PAR_MARK;
    83628:	f44f 62c0 	mov.w	r2, #1536	; 0x600
-		break;
    8362c:	e006      	b.n	8363c <uart_config+0x50>
-	case CDC_PAR_SPACE:
-		parity = US_MR_PAR_SPACE;
    8362e:	f44f 6280 	mov.w	r2, #1024	; 0x400
-		break;
    83632:	e003      	b.n	8363c <uart_config+0x50>
-	default:
-	case CDC_PAR_NONE:
-		parity = US_MR_PAR_NO;
    83634:	f44f 6200 	mov.w	r2, #2048	; 0x800
-		break;
    83638:	e000      	b.n	8363c <uart_config+0x50>
-		parity = US_MR_PAR_EVEN;
    8363a:	2200      	movs	r2, #0
-	}
-	
-	switch(cfg->bDataBits) {
    8363c:	798b      	ldrb	r3, [r1, #6]
    8363e:	1f5d      	subs	r5, r3, #5
    83640:	2d02      	cmp	r5, #2
-	case 5: case 6: case 7:
-		databits = cfg->bDataBits - 5;
    83642:	bf94      	ite	ls
    83644:	462b      	movls	r3, r5
-		break;
-	default:
-	case 8:
-		databits = US_MR_CHRL_8_BIT;
    83646:	23c0      	movhi	r3, #192	; 0xc0
-		break;
-	}
-
-	// Options for USART.
-	usart_options.baudrate = LE32_TO_CPU(cfg->dwDTERate);
    83648:	6809      	ldr	r1, [r1, #0]
    8364a:	4d12      	ldr	r5, [pc, #72]	; (83694 <uart_config+0xa8>)
    8364c:	6029      	str	r1, [r5, #0]
-	usart_options.char_length = databits;
    8364e:	606b      	str	r3, [r5, #4]
-	usart_options.parity_type = parity;
    83650:	60aa      	str	r2, [r5, #8]
-	usart_options.stop_bits = stopbits;
    83652:	60e8      	str	r0, [r5, #12]
-	usart_options.channel_mode = US_MR_CHMODE_NORMAL | US_MR_MAN;
    83654:	f04f 5300 	mov.w	r3, #536870912	; 0x20000000
    83658:	612b      	str	r3, [r5, #16]
-	imr = usart_get_interrupt_mask(usart);
    8365a:	4620      	mov	r0, r4
    8365c:	4b0e      	ldr	r3, [pc, #56]	; (83698 <uart_config+0xac>)
    8365e:	4798      	blx	r3
    83660:	4606      	mov	r6, r0
-	usart_disable_interrupt(usart, 0xFFFFFFFF);
    83662:	f04f 31ff 	mov.w	r1, #4294967295
    83666:	4620      	mov	r0, r4
    83668:	4b0c      	ldr	r3, [pc, #48]	; (8369c <uart_config+0xb0>)
    8366a:	4798      	blx	r3
-	usart_init_rs232(usart, &usart_options,
    8366c:	4a0c      	ldr	r2, [pc, #48]	; (836a0 <uart_config+0xb4>)
    8366e:	4629      	mov	r1, r5
    83670:	4620      	mov	r0, r4
    83672:	4b0c      	ldr	r3, [pc, #48]	; (836a4 <uart_config+0xb8>)
    83674:	4798      	blx	r3
-			sysclk_get_peripheral_hz());
-	//usart->US_MR |= US_MR_MAN; 
-	// Restore both RX and TX
-	usart_enable_tx(usart);
    83676:	4620      	mov	r0, r4
    83678:	4b0b      	ldr	r3, [pc, #44]	; (836a8 <uart_config+0xbc>)
    8367a:	4798      	blx	r3
-	usart_enable_rx(usart);
    8367c:	4620      	mov	r0, r4
    8367e:	4b0b      	ldr	r3, [pc, #44]	; (836ac <uart_config+0xc0>)
    83680:	4798      	blx	r3
-	usart_enable_interrupt(usart, imr);
    83682:	4631      	mov	r1, r6
    83684:	4620      	mov	r0, r4
    83686:	4b0a      	ldr	r3, [pc, #40]	; (836b0 <uart_config+0xc4>)
@@ -8443,39 +8207,19 @@ void uart_config(uint8_t port, usb_cdc_line_coding_t * cfg)
    836b0:	00083181 	.word	0x00083181
 
 000836b4 <uart_open>:
-}
-
-void uart_open(uint8_t port)
-{
    836b4:	b510      	push	{r4, lr}
-	if (0 == port) {
    836b6:	b1f8      	cbz	r0, 836f8 <uart_open+0x44>
-	} else if (1 == port) {
    836b8:	2801      	cmp	r0, #1
    836ba:	d111      	bne.n	836e0 <uart_open+0x2c>
-    NVIC->IP[((uint32_t)IRQn)]               = (uint8_t)((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL);
    836bc:	4b17      	ldr	r3, [pc, #92]	; (8371c <uart_open+0x68>)
    836be:	2230      	movs	r2, #48	; 0x30
    836c0:	f883 2311 	strb.w	r2, [r3, #785]	; 0x311
-    NVIC->ISER[(((uint32_t)IRQn) >> 5UL)] = (uint32_t)(1UL << (((uint32_t)IRQn) & 0x1FUL));
    836c4:	f44f 3200 	mov.w	r2, #131072	; 0x20000
    836c8:	601a      	str	r2, [r3, #0]
-		// IO is initialized in board init
-		// Enable interrupt with priority higher than USB
-		NVIC_SetPriority((IRQn_Type) USART_ID_1, USART_INT_LEVEL_1);
-		NVIC_EnableIRQ((IRQn_Type) USART_ID_1);
-		// Initialize it in RS232 mode.
-		pmc_enable_periph_clk(USART_ID_1);
    836ca:	2011      	movs	r0, #17
    836cc:	4b14      	ldr	r3, [pc, #80]	; (83720 <uart_open+0x6c>)
    836ce:	4798      	blx	r3
-		usart = USART_BASE_1;
    836d0:	4c14      	ldr	r4, [pc, #80]	; (83724 <uart_open+0x70>)
-		USART_ENABLE_1();
-	} else {
-		return;
-	}
-	if (usart_init_rs232(usart, &usart_options,
    836d2:	4a15      	ldr	r2, [pc, #84]	; (83728 <uart_open+0x74>)
    836d4:	4915      	ldr	r1, [pc, #84]	; (8372c <uart_open+0x78>)
    836d6:	4620      	mov	r0, r4
@@ -8484,42 +8228,28 @@ void uart_open(uint8_t port)
    836dc:	b108      	cbz	r0, 836e2 <uart_open+0x2e>
    836de:	bd10      	pop	{r4, pc}
    836e0:	bd10      	pop	{r4, pc}
-				sysclk_get_peripheral_hz())) {
-		return;
-	}
-	// Enable both RX and TX
-	usart_enable_tx(usart);
    836e2:	4620      	mov	r0, r4
    836e4:	4b13      	ldr	r3, [pc, #76]	; (83734 <uart_open+0x80>)
    836e6:	4798      	blx	r3
-	usart_enable_rx(usart);
    836e8:	4620      	mov	r0, r4
    836ea:	4b13      	ldr	r3, [pc, #76]	; (83738 <uart_open+0x84>)
    836ec:	4798      	blx	r3
-	// Enable interrupts
-	usart_enable_interrupt(usart, US_IER_RXRDY | US_IER_TXRDY);
    836ee:	2103      	movs	r1, #3
    836f0:	4620      	mov	r0, r4
    836f2:	4b12      	ldr	r3, [pc, #72]	; (8373c <uart_open+0x88>)
    836f4:	4798      	blx	r3
    836f6:	bd10      	pop	{r4, pc}
-    NVIC->IP[((uint32_t)IRQn)]               = (uint8_t)((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL);
    836f8:	4b08      	ldr	r3, [pc, #32]	; (8371c <uart_open+0x68>)
    836fa:	2230      	movs	r2, #48	; 0x30
    836fc:	f883 2312 	strb.w	r2, [r3, #786]	; 0x312
-    NVIC->ISER[(((uint32_t)IRQn) >> 5UL)] = (uint32_t)(1UL << (((uint32_t)IRQn) & 0x1FUL));
    83700:	f44f 2180 	mov.w	r1, #262144	; 0x40000
    83704:	6019      	str	r1, [r3, #0]
-    NVIC->IP[((uint32_t)IRQn)]               = (uint8_t)((priority << (8U - __NVIC_PRIO_BITS)) & (uint32_t)0xFFUL);
    83706:	f883 2311 	strb.w	r2, [r3, #785]	; 0x311
-    NVIC->ISER[(((uint32_t)IRQn) >> 5UL)] = (uint32_t)(1UL << (((uint32_t)IRQn) & 0x1FUL));
    8370a:	f44f 3200 	mov.w	r2, #131072	; 0x20000
    8370e:	601a      	str	r2, [r3, #0]
-		pmc_enable_periph_clk(USART_ID_0);
    83710:	2012      	movs	r0, #18
    83712:	4b03      	ldr	r3, [pc, #12]	; (83720 <uart_open+0x6c>)
    83714:	4798      	blx	r3
-		usart = USART_BASE_0;
    83716:	4c0a      	ldr	r4, [pc, #40]	; (83740 <uart_open+0x8c>)
    83718:	e7db      	b.n	836d2 <uart_open+0x1e>
    8371a:	bf00      	nop
@@ -8535,38 +8265,20 @@ void uart_open(uint8_t port)
    83740:	4009c000 	.word	0x4009c000
 
 00083744 <uart_close>:
-}
-
-void uart_close(uint8_t port)
-{
    83744:	b508      	push	{r3, lr}
-	if (0 == port) {
    83746:	b110      	cbz	r0, 8374e <uart_close+0xa>
-		// Disable interrupts
-		usart_disable_interrupt(USART_BASE_0, 0xFFFFFFFF);
-		// Close RS232 communication
-		USART_DISABLE_0();
-	}
-	else if (1 == port) {
    83748:	2801      	cmp	r0, #1
    8374a:	d006      	beq.n	8375a <uart_close+0x16>
    8374c:	bd08      	pop	{r3, pc}
-		usart_disable_interrupt(USART_BASE_0, 0xFFFFFFFF);
    8374e:	f04f 31ff 	mov.w	r1, #4294967295
    83752:	4805      	ldr	r0, [pc, #20]	; (83768 <uart_close+0x24>)
    83754:	4b05      	ldr	r3, [pc, #20]	; (8376c <uart_close+0x28>)
    83756:	4798      	blx	r3
    83758:	bd08      	pop	{r3, pc}
-		// Disable interrupts
-		usart_disable_interrupt(USART_BASE_1, 0xFFFFFFFF);
    8375a:	f04f 31ff 	mov.w	r1, #4294967295
    8375e:	4804      	ldr	r0, [pc, #16]	; (83770 <uart_close+0x2c>)
    83760:	4b02      	ldr	r3, [pc, #8]	; (8376c <uart_close+0x28>)
    83762:	4798      	blx	r3
-		// Close RS232 communication
-		USART_DISABLE_1();
-	}
-}
    83764:	e7f2      	b.n	8374c <uart_close+0x8>
    83766:	bf00      	nop
    83768:	4009c000 	.word	0x4009c000
